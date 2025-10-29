@@ -1,0 +1,348 @@
+body{
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-image: linear-gradient(to bottom,#FAFAFA,white,rgb(190, 115, 209));
+}
+
+.tela-inicial{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadein 1s ease-in forwards;
+}
+
+.titulo{
+    display: flex;
+    flex-direction: row;
+}
+
+#logo{
+    width: 8rem;
+    height: 8rem;
+}
+
+.texto-apresentacao{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.texto-apresentacao h1{
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 7rem;
+    font-weight: bolder;
+    background-image: linear-gradient(to bottom,rgb(121, 152, 255),rgb(207, 28, 192));
+    background-clip:text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.texto-apresentacao span{
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 2rem;
+    font-weight: bolder;
+    background-image: linear-gradient(to bottom,rgb(161, 181, 247),rgb(207, 28, 192));
+    background-clip:text;
+    -webkit-text-fill-color: transparent;
+}
+
+.container-input{
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin-top: 20px;
+    position: relative;
+    justify-content: center;
+    width: 60%;
+    background-color: #FAFAFA;
+    border: 2px solid;
+    border-color: blueviolet;
+    border-radius: 20px;
+    transition: border-width 0.2s;
+    height: 50px;
+    
+}
+
+.container-input input{
+    position: absolute;
+    width: 90%;
+    height: 100%;
+    background-color: transparent;
+    color:purple;
+    font-size: 1.5rem;
+    border: none;
+    outline: none;
+
+   
+   
+}
+
+.container-input:focus-within{
+    border: 4px solid;
+    border-color: rgb(182, 132, 229);
+    box-shadow: 0 0 5px rgba(236, 38, 226, 0.5);
+}
+
+.container-input button{
+    position: absolute;
+    right:0;
+    margin-top: 2px;
+    background-color: transparent;
+    border-left:2px solid;
+    border-color: #0a0a0a;
+    border: none;
+    height: 50px;
+    border-radius: 0px 20px 20px 0px;
+    cursor: pointer;
+}
+
+.icone-busca{
+    width: 2rem;
+    height: 2rem;
+    fill: rgba(236, 38, 226, 0.5);
+}
+
+.configuracoes-quiz{
+    margin-top: 20px;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.dificuldade-select{
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.container-quiz {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+.quiz-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.quiz-header h2 {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background-image: linear-gradient(to bottom, rgb(121, 152, 255), rgb(207, 28, 192));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 10px 0;
+}
+
+.progresso {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.quiz-body {
+    background-color: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 50%;
+    width: 100%;
+    min-height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading {
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.5rem;
+    color: rgb(121, 152, 255);
+}
+
+.pergunta-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#pergunta-texto {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0 0 20px 0;
+}
+
+.opcoes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.opcao {
+    padding: 15px 20px;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.2rem;
+    background-color: #f5f5f5;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.opcao:hover {
+    background-color: #e8e8ff;
+    border-color: rgb(121, 152, 255);
+}
+
+.opcao.selecionada {
+    background-color: rgb(121, 152, 255);
+    color: white;
+    border-color: rgb(121, 152, 255);
+}
+
+.quiz-footer {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.btn-acao {
+    padding: 15px 40px;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-image: linear-gradient(to right, rgb(121, 152, 255), rgb(207, 28, 192));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-acao:hover {
+    transform: scale(1.05);
+}
+
+.btn-acao:active {
+    transform: scale(0.95);
+}
+
+.resultado{
+    background-color: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 50%;
+    width: 100%;
+    min-height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.resultado h2{
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background-image: linear-gradient(to bottom, rgb(121, 152, 255), rgb(207, 28, 192));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.resultado p{
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+
+@media (max-width: 600px){
+    .texto-apresentacao h1{
+        font-size: 3rem;
+    }
+
+    .texto-apresentacao span{
+        font-size: 1rem;
+    }
+    .container-input{
+        width:80%;
+    }
+
+    .container-input input{
+        width: 70%;
+    }
+
+    .quiz-header h2 {
+        font-size: 1.8rem;
+    }
+
+    #pergunta-texto {
+        font-size: 1.3rem;
+    }
+
+    .quiz-body {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 601px) and (max-width:1200px){
+    .texto-apresentacao h1{
+        font-size: 5rem;
+    }
+
+    .texto-apresentacao span{
+        font-size: 2rem;
+    }
+    .container-input{
+        width:80%;
+    }
+
+    .container-input input{
+        width: 80%;
+    }
+}
