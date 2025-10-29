@@ -65,24 +65,56 @@ function Quiz(assunto,dificuldade) {
         return container;
     };
 
-    this.carregarPerguntas = function() { // Função que carrega as perguntas usando IA
-        setTimeout(() => {
-            this.perguntas = [
-                {
-                    pergunta: "Pergunta de exemplo 1?",
-                    opcoes: ["Opção A", "Opção B", "Opção C", "Opção D"],
-                    respostaCorreta: 0
+   this.carregarPerguntas = function() { // Função que carrega as perguntas usando IA
+        const API_KEY = "AIzaSyDquvgicOwC4Sk4zo4HqY5QZDkvC7uFQOw";
+        
+        const prompt = `Crie um quiz de 5 perguntas sobre ${this.assunto} com dificuldade ${this.dificuldade}.
+        Forneça as perguntas no seguinte formato JSON puro (sem markdown, sem \`\`\`json):
+        [
+        {
+                "pergunta": "Texto da pergunta?",
+                "opcoes": ["Opção 1", "Opção 2", "Opção 3", "Opção 4"],
+                "respostaCorreta": 0
+        }
+        ]
+        Retorne APENAS o array JSON, nada mais.`;
+
+        fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
+            {
+                method: "POST",
+                headers: {
+                    "x-goog-api-key": API_KEY,
+                    "Content-Type": "application/json"
                 },
-                {
-                    pergunta: "Pergunta de exemplo 2?",
-                    opcoes: ["Opção A", "Opção B", "Opção C", "Opção D"],
-                    respostaCorreta: 1
-                }
-            ];
-            
-            this.exibirPergunta();
-        }, 2000);
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }
+                    ]
+                })
+            }
+        )
+        .then(response => response.json())
+        .then(data => {
+            const resposta = data.candidates[0].content.parts[0].text;
+            try {
+                this.perguntas = JSON.parse(resposta);
+                this.exibirPergunta();
+            }
+            catch (e) {
+                console.error("Erro ao analisar o JSON das perguntas:", e);
+                alert("Houve um erro ao gerar as perguntas do quiz. Por favor, tente novamente.");
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao gerar perguntas:", err);
+            alert("Houve um erro ao gerar as perguntas do quiz. Por favor, tente novamente.");
+        });
     };
+
 
     this.exibirPergunta = function() { // Função que exibe a pergunta atual
         const loading = document.getElementById("loading");
@@ -151,6 +183,23 @@ function Quiz(assunto,dificuldade) {
         });
     };
 
+    this.mostrarErros = function() { // Função que mostra as perguntas erradas
+        const containerQuiz = document.querySelector(".container-quiz");
+        let detalhes = "<h3>Detalhes das Perguntas Erradas:</h3><ul>";
+        this.perguntas.forEach((pergunta, index) => {
+            if (pergunta.respostaCorreta !== this.respostas[index]) {
+                detalhes += `<li>
+                    <strong>Pergunta:</strong> ${pergunta.pergunta}<br>
+                    <strong>Sua Resposta:</strong> ${pergunta.opcoes[this.respostas[index]] || "Nenhuma resposta"}<br>
+                    <strong>Resposta Correta:</strong> ${pergunta.opcoes[pergunta.respostaCorreta]}
+                </li>`;
+            }
+        });
+        detalhes += "</ul>";
+        containerQuiz.innerHTML += detalhes;
+
+    }
+
     this.calcularAcertos = function() { // Função que calcula o número de acertos
         let acertos = 0;
         this.perguntas.forEach((pergunta, index) => {
@@ -158,6 +207,9 @@ function Quiz(assunto,dificuldade) {
                 acertos++;
             }
         });
+        if (acertos < this.perguntas.length) {
+            this.mostrarErros();
+        }
          return acertos;
     }
 }
