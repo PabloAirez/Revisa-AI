@@ -1,15 +1,12 @@
 {
   "name": "revisa-AI",
   "version": "1.0.0",
-  "description": "API simples que gera perguntas e resumos usando a API do Gemini",
+  "description": "API e frontend do Revisa-AI",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/server.js",
     "dev": "nodemon api/server.js"
   },
-  "keywords": ["api", "gemini", "quiz", "node"],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
