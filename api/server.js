@@ -6,12 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Log simplificado (sem loops infinitos)
-app.use((req, res, next) => {
-  console.log(`[API] ${req.method} ${req.path}`);
-  next();
-});
-
 app.get('/', (req, res) => {
   res.json({
     mensagem: 'API Revisa-AI funcionando!',
@@ -22,6 +16,5 @@ app.get('/', (req, res) => {
   });
 });
 
-// Mantém tuas outras rotas (gerar_perguntas, gerar_resumo, etc.)
 
 module.exports = app;
