@@ -94,10 +94,18 @@ app.post('/gerar_resumo', async (req, res) => {
       });
     }
 
-    const prompt = `Você é um tutor educacional. O aluno errou as seguintes perguntas sobre ${assunto}:
+      const prompt = `Você é um tutor educacional. O aluno errou as seguintes perguntas em um quiz sobre ${this.assunto}:
+
 ${perguntasErradas.map((p, i) => `${i + 1}. ${p}`).join('\n')}
 
-Crie um resumo educativo explicando os conceitos relacionados a essas perguntas.`;
+Crie um resumo educativo e didático explicando os conceitos relacionados a essas perguntas. 
+O resumo deve:
+- Ser claro e objetivo
+- Explicar os conceitos de forma simples
+- Ajudar o aluno a entender onde errou
+- Ter cerca de 200-300 palavras
+
+Forneça apenas o texto do resumo, sem introduções como "Aqui está o resumo".`;
 
     const response = await fetch(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
@@ -135,7 +143,6 @@ Crie um resumo educativo explicando os conceitos relacionados a essas perguntas.
   }
 });
 
-// 🚀 Inicialização do servidor (Render define process.env.PORT)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
