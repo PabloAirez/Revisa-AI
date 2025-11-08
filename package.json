@@ -1,9 +1,13 @@
 {
   "name": "revisa-ai",
   "version": "1.0.0",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js"
+  },
   "dependencies": {
+    "express": "^4.19.0",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "serverless-http": "^3.2.0"
+    "dotenv": "^16.0.3"
   }
 }
