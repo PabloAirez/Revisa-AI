@@ -1,7 +1,5 @@
-// api/index.js
 const app = require('./server');
-console.log("entrou aqui");
+const serverless = require('serverless-http');
 
-// Para Vercel Serverless Functions
-// Exporta o handler que processa todas as requisições
-module.exports = app;
+// Exporta no formato que o Vercel espera
+module.exports = serverless(app);
