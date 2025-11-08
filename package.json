@@ -1,11 +1,14 @@
 {
-  "name": "revisa-AI",
+  "name": "revisa-ai",
   "version": "1.0.0",
   "description": "API e frontend do Revisa-AI",
   "main": "api/index.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "start": "node api/server.js",
-    "dev": "nodemon api/server.js"
+    "dev": "node api/server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
