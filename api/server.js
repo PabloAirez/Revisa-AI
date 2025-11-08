@@ -5,19 +5,21 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware base
 app.use(cors());
 app.use(express.json());
 
-// 🧩 Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// 🏠 Rota raiz → exibe o index.html da pasta public
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-// 🧠 Rota: Gerar Perguntas
+app.get('/teste', (req, res) => {
+  return res.status(200).json({
+        sucess: 'Rotas funcionando!',
+      });
+});
+
 app.post('/gerar_perguntas', async (req, res) => {
   try {
     const { assunto, dificuldade } = req.body;
@@ -82,7 +84,6 @@ app.post('/gerar_perguntas', async (req, res) => {
   }
 });
 
-// 📘 Rota: Gerar Resumo
 app.post('/gerar_resumo', async (req, res) => {
   try {
     const { assunto, perguntasErradas } = req.body;
