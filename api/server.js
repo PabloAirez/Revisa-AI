@@ -1,26 +1,45 @@
-// server.js
+// api/server.js
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
 // Validação da API Key
 if (!process.env.GEMINI_API_KEY) {
-    console.error('ERRO: GEMINI_API_KEY não encontrada no arquivo .env');
-    process.exit(1);
+    console.error('ERRO: GEMINI_API_KEY não encontrada');
 }
+
+// Middleware para log de rotas (debug)
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
+
+// Rota raiz da API - IMPORTANTE: sem /api no path
+app.get('/', (req, res) => {
+    res.json({ 
+        mensagem: 'API Revisa-AI funcionando!',
+        rotas: {
+            gerarPerguntas: 'POST /api/gerar_perguntas',
+            gerarResumo: 'POST /api/gerar_resumo'
+        }
+    });
+});
+
+// Rota de teste alternativa
+app.get('/test', (req, res) => {
+    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // Rota: Gerar Perguntas
 app.post('/gerar_perguntas', async (req, res) => {
     try {
         const { assunto, dificuldade } = req.body;
 
-        // Validação dos dados
         if (!assunto || !dificuldade) {
             return res.status(400).json({ 
                 erro: 'Assunto e dificuldade são obrigatórios' 
@@ -30,11 +49,11 @@ app.post('/gerar_perguntas', async (req, res) => {
         const prompt = `Crie um quiz de 5 perguntas sobre ${assunto} com dificuldade ${dificuldade}.
         Forneça as perguntas no seguinte formato JSON puro (sem markdown, sem \`\`\`json):
         [
-        {
+            {
                 "pergunta": "Texto da pergunta?",
                 "opcoes": ["Opção 1", "Opção 2", "Opção 3", "Opção 4"],
                 "respostaCorreta": 0
-        }
+            }
         ]
         Retorne APENAS o array JSON, nada mais.`;
 
@@ -65,7 +84,6 @@ app.post('/gerar_perguntas', async (req, res) => {
         const resposta = data.candidates[0].content.parts[0].text;
 
         try {
-            // Remove possíveis markdown tags
             const jsonLimpo = resposta.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
             const perguntas = JSON.parse(jsonLimpo);
             
@@ -75,7 +93,6 @@ app.post('/gerar_perguntas', async (req, res) => {
             });
         } catch (e) {
             console.error('Erro ao analisar o JSON das perguntas:', e);
-            console.error('Resposta recebida:', resposta);
             res.status(500).json({ 
                 erro: 'Erro ao processar as perguntas geradas',
                 detalhes: e.message
@@ -95,7 +112,6 @@ app.post('/gerar_resumo', async (req, res) => {
     try {
         const { assunto, perguntasErradas } = req.body;
 
-        // Validação dos dados
         if (!assunto || !perguntasErradas || !Array.isArray(perguntasErradas)) {
             return res.status(400).json({ 
                 erro: 'Assunto e perguntasErradas (array) são obrigatórios' 
@@ -159,14 +175,6 @@ Forneça apenas o texto do resumo, sem introduções como "Aqui está o resumo".
             detalhes: erro.message
         });
     }
-});
-
-
-// Rota de teste
-app.get('/', (req, res) => {
-    res.json({ 
-        mensagem: 'API funcionando!'
-    });
 });
 
 module.exports = app;

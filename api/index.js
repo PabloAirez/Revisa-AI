@@ -1,5 +1,6 @@
+// api/index.js
 const app = require('./server');
 
-module.exports = (req, res) => {
-  return app(req, res);
-};
+// Para Vercel Serverless Functions
+// Exporta o handler que processa todas as requisições
+module.exports = app;
