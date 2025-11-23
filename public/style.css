@@ -196,6 +196,51 @@ body{
     gap: 20px;
 }
 
+/* Estilos para o timer do quiz temporizado */
+.timer-display {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #E3F2FD;
+    border: 2px solid #1976D2;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timer-display.timer-alerta {
+    background-color: #FFEBEE;
+    border-color: #F44336;
+    animation: pulse 0.5s ease-in-out infinite;
+    box-shadow: 0 2px 12px rgba(244, 67, 54, 0.3);
+}
+
+.timer-icon {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.timer-texto {
+    font-family: "Noto Sans", sans-serif;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: bold;
+    color: #1976D2;
+}
+
+.timer-alerta .timer-texto {
+    color: #F44336;
+}
+
+#timer-segundos {
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-weight: bold;
+}
+
 #pergunta-texto {
     font-family: "Noto Sans", sans-serif;
     font-size: clamp(1.2rem, 2.8vw, 1.8rem);
@@ -274,7 +319,8 @@ body{
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    margin: 20px 0;
+    margin: 20px auto;
+    display: block;
     box-sizing: border-box;
 }
 
@@ -433,6 +479,14 @@ body{
     transform: translateY(0);
 }
 
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -495,6 +549,11 @@ body{
 
     .resumo-texto {
         padding: 15px;
+    }
+    
+    .timer-display {
+        padding: 10px;
+        gap: 8px;
     }
 }
 

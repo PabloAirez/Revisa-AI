@@ -79,7 +79,7 @@ function Quiz(assunto, dificuldade) {
     this.perguntas = [];
     this.respostas = [];
     this.usuario = new Usuario("Convidado"); // Como ainda não tem login, o usuário é sempre "Convidado"
-    this.urlbase = API_CONFIG.local; // Aqui eu faria uma lógica para alternar entre local e produção 
+    this.urlbase = API_CONFIG.producao; // Aqui eu faria uma lógica para alternar entre local e produção 
     // mas como não sei se terei node na apresentação, deixei fixo para produção
 }
 
@@ -234,15 +234,18 @@ Quiz.prototype.proximaPergunta = function () {
 Quiz.prototype.finalizarQuiz = function () {
     const containerQuiz = document.querySelector(".container-quiz");
     if (containerQuiz) {
-        containerQuiz.style.display = "none";
+       containerQuiz.innerHTML = "";
+       containerQuiz.style.display = "flex";
+       containerQuiz.style.opacity = "1";
     }
 
     let containerResultado = document.querySelector(".resultado");
     if (!containerResultado) {
         containerResultado = document.createElement("div");
         containerResultado.className = "resultado";
-        document.body.appendChild(containerResultado);
+        containerQuiz.appendChild(containerResultado); 
     }
+
 
     const acertos = this.calcularAcertos();
     const total = this.perguntas.length;
@@ -255,7 +258,9 @@ Quiz.prototype.finalizarQuiz = function () {
             // Compara a reposta correta (indice da opção correta) com a resposta do usuário
             perguntasErradas.push({ // Armazena detalhes da pergunta errada
                 pergunta: pergunta.texto,
-                suaResposta: typeof this.respostas[index] === "number" ? pergunta.opcoes[this.respostas[index]] : "Não respondida",
+                suaResposta: typeof this.respostas[index] === "number" && this.respostas[index] >= 0 
+                    ? pergunta.opcoes[this.respostas[index]] 
+                    : "Não respondida",
                 respostaCorreta: pergunta.opcoes[pergunta.respostaCorreta]
             });
         }
@@ -425,40 +430,83 @@ function QuizTemporizado(assunto, dificuldade, tempoPorPergunta) {
 QuizTemporizado.prototype = Object.create(Quiz.prototype); // Herda os métodos da classe Quiz
 QuizTemporizado.prototype.constructor = QuizTemporizado; // Especifica que ele deve usar o construtor QuizTemporizado
 
-// Aqui, nós sobrescrevemos o método exibirPergunta para implementar a lógica do timer
+// Aqui, eu sobrescrevo o método exibirPergunta para implementar a lógica do timer
 QuizTemporizado.prototype.exibirPergunta = function () {
     Quiz.prototype.exibirPergunta.call(this);
+    this.criarElementoTimer(); // Cria o elemento visual do timer
     this.iniciarTimer();
+};
+
+// Cria o elemento HTML para exibir o timer na tela
+QuizTemporizado.prototype.criarElementoTimer = function () {
+    const perguntaContainer = document.getElementById("pergunta-container");
+    if (!perguntaContainer) return;
+    
+    // Remove timer anterior se existir
+    const timerAntigo = document.getElementById("timer-display");
+    if (timerAntigo) {
+        timerAntigo.remove();
+    }
+    
+    // Cria o novo elemento do timer
+    const timerElement = document.createElement("div");
+    timerElement.id = "timer-display";
+    timerElement.className = "timer-display";
+    timerElement.innerHTML = `
+        <div class="timer-icon">⏱️</div>
+        <div class="timer-texto">Tempo restante: <span id="timer-segundos">${this.tempoPorPergunta}</span>s</div>
+    `;
+    
+    // Insere o timer antes do texto da pergunta
+    const perguntaTexto = document.getElementById("pergunta-texto");
+    if (perguntaTexto) {
+        perguntaContainer.insertBefore(timerElement, perguntaTexto);
+    }
 };
 
 // Cria um intervalo que decrementa o tempo restante e avança automaticamente se o tempo acabar
 QuizTemporizado.prototype.iniciarTimer = function () {
     if (this.intervalo) clearInterval(this.intervalo);
     let tempoRestante = this.tempoPorPergunta; // Tempo em segundos
-    const btnProximo = document.getElementById("btn-proximo");
-    this.intervalo = setInterval(()=>{ // Verifica o tempo restante a cada segundo
+    const timerSegundos = document.getElementById("timer-segundos");
+    const timerDisplay = document.getElementById("timer-display");
+    
+    this.intervalo = setInterval(() => { // Verifica o tempo restante a cada segundo
         tempoRestante--;
+        
+        // Atualiza o texto do timer
+        if (timerSegundos) {
+            timerSegundos.textContent = tempoRestante;
+        }
+        
+        // Adiciona classe de alerta quando restam 5 segundos ou menos
+        if (timerDisplay && tempoRestante <= 5) {
+            timerDisplay.classList.add("timer-alerta");
+        }
+        
         if (tempoRestante <= 0) { // Se acabou o tempo, já era meu querido, passa para a próxima
             clearInterval(this.intervalo);
-            if (btnProximo) btnProximo.click();
+            
+            // Se o usuário não respondeu, marca como não respondida
+            if (typeof this.respostas[this.perguntaAtual] === "undefined") {
+                this.respostas[this.perguntaAtual] = -1; // -1 indica que não foi respondida
+            }
+            
+            // Avança para a próxima pergunta
+            this.proximaPergunta();
         }
     }, 1000);
 };
 
+// Sobrescreve o método proximaPergunta para limpar o intervalo do timer
+QuizTemporizado.prototype.proximaPergunta = function () {
+    if (this.intervalo) {
+        clearInterval(this.intervalo); // Limpa o timer antes de avançar
+    }
+    Quiz.prototype.proximaPergunta.call(this); // Chama o método da classe pai
+};
 
-function esperar(ms) {
-    return new Promise(function (resolve, reject) {
-        if (ms < 0) {
-            reject(new Error("Tempo inválido"));
-            return;
-        }
-        setTimeout(function () {
-            resolve("Concluído");
-        }, ms);
-    });
-}
 
- 
 function esperar(ms) {
     return new Promise(function (resolve, reject) {
         if (ms < 0) {
