@@ -16,9 +16,12 @@ app.get('/', (req, res) => {
 
 app.get('/teste', (req, res) => {
   return res.status(200).json({
-        sucess: 'Rotas funcionando!',
-      });
+    sucess: 'Rotas funcionando!',
+  });
 });
+
+const GEMINI_URL_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 app.post('/gerar_perguntas', async (req, res) => {
   try {
@@ -41,31 +44,36 @@ app.post('/gerar_perguntas', async (req, res) => {
     ]
     Retorne APENAS o array JSON, nada mais.`;
 
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
-      {
-        method: 'POST',
-        headers: {
-          'x-goog-api-key': process.env.GEMINI_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
-      }
-    );
+    const url = `${GEMINI_URL_BASE}/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt }
+            ]
+          }
+        ],
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Erro na API do Gemini: ${response.status}`);
+      const textoErro = await response.text().catch(() => '');
+
+      throw new Error(`Erro na API do Gemini (perguntas): ${response.status} - ${textoErro}`);
     }
 
     const data = await response.json();
-    const resposta = data.candidates[0].content.parts[0].text;
+    const resposta = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!resposta) {
+      throw new Error('Resposta vazia ou inválida do Gemini ao gerar perguntas.');
+    }
 
     const jsonLimpo = resposta
       .replace(/```json\n?/g, '')
@@ -94,7 +102,7 @@ app.post('/gerar_resumo', async (req, res) => {
       });
     }
 
-      const prompt = `Você é um tutor educacional. O aluno errou as seguintes perguntas em um quiz sobre ${this.assunto}:
+    const prompt = `Você é um tutor educacional. O aluno errou as seguintes perguntas em um quiz sobre ${assunto}:
 
 ${perguntasErradas.map((p, i) => `${i + 1}. ${p}`).join('\n')}
 
@@ -107,31 +115,33 @@ O resumo deve:
 
 Forneça apenas o texto do resumo, sem introduções como "Aqui está o resumo".`;
 
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
-      {
-        method: 'POST',
-        headers: {
-          'x-goog-api-key': process.env.GEMINI_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
-      }
-    );
+    const url = `${GEMINI_URL_BASE}/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Erro na API do Gemini: ${response.status}`);
+      const textoErro = await response.text().catch(() => '');
+      throw new Error(`Erro na API do Gemini (resumo): ${response.status} - ${textoErro}`);
     }
 
     const data = await response.json();
-    const resumo = data.candidates[0].content.parts[0].text;
+    const resumo = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!resumo) {
+      throw new Error('Resposta vazia ou inválida do Gemini ao gerar resumo.');
+    }
 
     res.json({ sucesso: true, resumo });
   } catch (erro) {
